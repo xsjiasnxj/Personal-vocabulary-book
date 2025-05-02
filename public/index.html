@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人单词本</title>
+    <style>
+        :root {
+            --primary: #4834d4;
+            --secondary: #686de0;
+            --success: #6ab04c;
+            --danger: #eb4d4b;
+            --light: #f9f9f9;
+            --dark: #130f40;
+            --gray: #95afc0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .nav-btn.active {
+            background-color: var(--dark);
+        }
+
+        .section {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        /* 添加单词部分 */
+        .add-word-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gray);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .word-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 5px;
+            display: none;
+        }
+
+        /* 复习部分 */
+        .review-container {
+            text-align: center;
+        }
+
+        .word-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .word-to-review {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .word-meaning {
+            font-size: 18px;
+            color: var(--gray);
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .example-sentence {
+            font-style: italic;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .review-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #78c659;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #ff6b6b;
+        }
+
+        /* 测试部分 */
+        .test-container {
+            text-align: center;
+        }
+
+        .test-sentence {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f5f6fa;
+            border-radius: 10px;
+        }
+
+        /* 单词列表部分 */
+        .word-list-container {
+            margin-top: 20px;
+        }
+
+        .word-list {
+            list-style: none;
+        }
+
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .word-item:last-child {
+            border-bottom: none;
+        }
+
+        .word-text {
+            font-weight: bold;
+        }
+
+        .word-date {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .word-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>个人单词本</h1>
+            <p>基于艾宾浩斯遗忘曲线的智能记忆系统</p>
+        </header>
+
+        <nav>
+            <button class="nav-btn active" data-section="add-word">添加单词</button>
+            <button class="nav-btn" data-section="review">复习单词</button>
+            <button class="nav-btn" data-section="test">情境测试</button>
+            <button class="nav-btn" data-section="word-list">单词列表</button>
+        </nav>
+
+        <!-- 添加单词部分 -->
+        <div id="add-word" class="section active">
+            <h2>添加新单词</h2>
+            <div class="add-word-form">
+                <div class="form-group">
+                    <label for="word-input">输入单词</label>
+                    <input type="text" id="word-input" placeholder="请输入要记忆的单词">
+                </div>
+                <button class="btn" id="add-word-btn">添加单词</button>
+            </div>
+
+            <div class="word-info" id="word-info">
+                <h3 id="word-title"></h3>
+                <p id="word-meaning"></p>
+                <div id="word-examples"></div>
+            </div>
+        </div>
+
+        <!-- 复习单词部分 -->
+        <div id="review" class="section">
+            <h2>单词复习</h2>
+            <div class="review-container">
+                <div class="word-card">
+                    <div class="word-to-review" id="review-word">准备开始复习</div>
+                    <div class="word-meaning" id="review-meaning"></div>
+                    <div class="example-sentence" id="review-example"></div>
+                </div>
+
+                <div class="review-actions">
+                    <button class="btn" id="start-review">开始复习</button>
+                    <button class="btn btn-success" id="know-word" style="display: none;">认识 ✓</button>
+                    <button class="btn btn-danger" id="dont-know-word" style="display: none;">不认识 ✗</button>
+                    <button class="btn" id="show-meaning" style="display: none;">显示释义</button>
+                    <button class="btn" id="next-word" style="display: none;">下一个 →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 情境测试部分 -->
+        <div id="test" class="section">
+            <h2>情境测试</h2>
+            <div class="test-container">
+                <div class="test-sentence" id="test-sentence">
+                    点击"开始测试"按钮开始情境理解测试。
+                </div>
+
+                <div class="review-actions">
+                    <button class="btn" id="start-test">开始测试</button>
+                    <button class="btn" id="show-test-words" style="display: none;">显示单词释义</button>
+                    <button class="btn" id="next-test" style="display: none;">下一题 →</button>
+                </div>
+
+                <div class="word-info" id="test-words-info" style="display: none;">
+                    <!-- 测试句子中的单词释义会显示在这里 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 单词列表部分 -->
+        <div id="word-list" class="section">
+            <h2>我的单词</h2>
+            <div class="word-list-container">
+                <ul class="word-list" id="words-list">
+                    <!-- 单词列表将通过JavaScript动态生成 -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
